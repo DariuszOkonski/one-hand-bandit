@@ -2,7 +2,6 @@
 import Wallet from './Wallet.js';
 import Statistics from './Statistics.js';
 import Draw from './Draw.js';
+import Result from './Result.js';
 
-const draw = new Draw();
-console.log(draw);
-console.log(draw.drawResult());
+console.log(Result.checkWinner(['green', 'red', 'blue']));
