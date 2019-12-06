@@ -8,7 +8,7 @@ class Game {
     this.stats = new Statistics();
     this.wallet = new Wallet(start);
 
-    document.getElementById('start').addEventListener('click', this.startGame);
+    document.getElementById('start').addEventListener('click', this.startGame.bind(this));
     this.spanWallet = document.querySelector('.wallet');
     this.boards = [...document.querySelectorAll('.color')];
     this.inputBid = document.getElementById('bid');
@@ -28,9 +28,9 @@ class Game {
     this.spanWallet.textContent = money + '$';
 
     if (result) {
-      result = `You won ${wonMoney}`;
+      result = `You won ${wonMoney}$.`;
     } else if (!result && result !== '') {
-      result = `You lost ${bid}`;
+      result = `You lost ${bid}$.`;
     } else {
       result = '';
     }
@@ -42,7 +42,31 @@ class Game {
   }
 
   startGame() {
-    console.log(this)
+    if (this.inputBid.value < 1)
+      return alert('Amount of money you placed can not be less than 1$');
+
+    const bid = Math.floor(this.inputBid.value);
+
+    if (!this.wallet.checkCanPlay(bid))
+      return alert('You do not have enough money to play');
+
+    this.wallet.changeWallet(bid, '-');
+
+    this.draw = new Draw();
+    const colors = this.draw.getDrawResult();
+    const win = Result.checkWinner(colors);
+    const wonMoney = Result.moneyWinInGame(win, bid);
+    this.wallet.changeWallet(wonMoney, '+');
+    this.stats.addGameToStatistics(win, bid);
+
+    this.render(colors, this.wallet.getWalletValue(), this.stats.showGameStatistics(), win, bid, wonMoney)
+
+    document.getElementById('start').setAttribute('disabled', 'true');
+
+    setTimeout(() => {
+      document.getElementById('start').removeAttribute('disabled')
+      this.inputBid.value = '';
+    }, 2000);
   }
 }
 
